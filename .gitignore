@@ -3,12 +3,14 @@ Makefile.in
 aclocal.m4
 autom4te.cache/
 config.*
+/autoscan.log
 /configure
 /compile
 /depcomp
 /install-sh
 /libtool
 /missing
+/test-driver
 /stamp-h?
 .deps/
 .dirstamp
