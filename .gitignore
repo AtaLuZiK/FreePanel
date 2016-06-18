@@ -19,3 +19,9 @@ config.*
 *.o
 *~
 
+# eclipse
+.cproject
+.project
+.buildpath
+.settings/
+
