@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     char configFile[FILENAME_MAX];
     sprintf(configFile, "%s/freepaneld.cfg", SYSCONFDIR);
     AppConfig& appConfig = AppConfig::GetInstance();
-    appConfig.Load(configFile);
+    appConfig.Load(FREEPANELD_CONF);
     appConfig.Save();
     Server server;
     server.Run(serverPort);

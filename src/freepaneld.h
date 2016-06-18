@@ -7,6 +7,7 @@
 
 #define FREEPANELD_VERSION VERSION
 #define DAEMON_NAME PACKAGE_NAME
+#define FREEPANELD_CONF SYSCONFDIR"/freepaneld.cfg"
 
 #endif
 
