@@ -32,6 +32,9 @@ void usage()
 
 int main(int argc, char *argv[])
 {
+    if (getuid()) {
+        std::cerr << "!!!freepaneld not run as root!!!" << std::endl;
+    }
     u_short serverPort = 0;
     while (true) {
         int index = 0;
