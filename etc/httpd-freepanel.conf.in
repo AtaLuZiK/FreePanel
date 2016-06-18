@@ -1,0 +1,16 @@
+<VirtualHost *:8998>
+    ServerAdmin webmaster@example.com
+    #php_admin_value open_basedir "@FREEPANEL_INSTALL_DIR@/web:/tmp/:/var/tmp/:/proc/"
+    DocumentRoot "@FREEPANEL_INSTALL_DIR@/web"
+    ServerName 0.0.0.0
+    ErrorLog "@FREEPANEL_INSTALL_DIR@/logs/freepanel-error_log"
+    CustomLog "@FREEPANEL_INSTALL_DIR@/logs/freepanel-access_log" common
+    <Directory "@FREEPANEL_INSTALL_DIR@/web">
+        SetOutputFilter DEFLATE
+        Options FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+        DirectoryIndex default.html index.html default.htm index.htm default.php index.php
+    </Directory>
+</VirtualHost>
