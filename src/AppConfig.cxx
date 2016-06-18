@@ -19,8 +19,6 @@ bool AppConfig::Load(const char *pszFilename)
         std::cerr << "Parse error at " << e.getFile() << ":" << e.getLine()
             << " - " << e.getError() << std::endl;
         return false;
-    } catch(const SettingNameException& e) {
-        std::cerr << "Hello world" << std::endl;
     }
 
     const Setting& root = cfg.getRoot();
