@@ -28,5 +28,28 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset socket strcasecmp strchr strdup strerror])
 
 AC_PREFIX_DEFAULT(/usr/local/freepanel)
+AC_ARG_WITH([apache-dir], AS_HELP_STRING([--with-apache-dir], [Set the path where apache was installed]), 
+    AC_CHECK_FILE([$with_php_dir/bin/php], 
+        AC_SUBST([APACHE_INSTALL_DIR], [$with_apache_dir]), 
+        AC_MSG_FAILURE($with_apache_dir not apache install directory)
+    ), 
+    AC_SUBST([APACHE_INSTALL_DIR])
+    )
+AC_ARG_WITH([mysql-dir], AS_HELP_STRING([--with-mysql-dir], [Set the path where MYSQL was installed]), 
+    AC_CHECK_FILE([$with_mysql_dir/bin/mysqld], 
+        AC_SUBST([MYSQL_INSTALL_DIR], [$with_mysql_dir]), 
+        AC_MSG_FAILURE($with_mysql_dir not mysql install directory)
+        ), 
+    AC_SUBST([MYSQL_INSTALL_DIR])
+    )
+AC_ARG_WITH([php-dir], AS_HELP_STRING([--with-php-dir], [Set the path where PHP was installed]), 
+    AC_CHECK_FILE([$with_php_dir/bin/php], 
+        AC_SUBST([PHP_INSTALL_DIR], [$with_php_dir]), 
+        AC_MSG_FAILURE($with_php_dir not php install directory)
+        ), 
+    AC_SUBST([PHP_INSTALL_DIR])
+    )
+config_in_files=etc/freepaneld.cfg
 AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
+AC_CONFIG_FILES([$config_in_files])
 AC_OUTPUT

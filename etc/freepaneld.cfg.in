@@ -1,0 +1,6 @@
+installed : 
+{
+  apache = "@APACHE_INSTALL_DIR@";
+  mysql = "@MYSQL_INSTALL_DIR@";
+  php = "@PHP_INSTALL_DIR@";
+};
