@@ -17,5 +17,7 @@ const char *skip_space(const char *string, const char *pEnd = NULL);
 
 char *rtrim(char *string);
 
+bool check_digit(const char *s);
+
 #endif
 

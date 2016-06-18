@@ -39,3 +39,14 @@ char *rtrim(char *string)
     return string;
 }
 
+
+bool check_digit(const char *s)
+{
+    while (*s) {
+        if (!isdigit(*s))
+            return false;
+        ++s;
+    }
+    return true;
+}
+

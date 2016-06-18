@@ -8,26 +8,16 @@
 #include "AppConfig.h"
 #include <regex>
 #include <iostream>
-
-
-inline bool CheckDigit(const char *s)
-{
-    while (*s) {
-        if (!isdigit(*s))
-            return false;
-        ++s;
-    }
-    return true;
-}
+#include <stdio.h>
+#define FREEPANEL_HTTPD_CONF SYSCONFDIR"/httpd-freepanel.conf"
 
 
 void SettingsHandler::OnRequest(HttpRequest& request, HttpResponse& response)
 {
-    printf("settingsHandler\n");
     response.SetHeader("Content-Type", "text/html;charset=utf-8");
     const char *type = request.GetParameter("type");
     if (type == nullptr) {
-        response.Write("invalid0");
+        response.Write("0");
         return;
     }
     
@@ -40,37 +30,100 @@ void SettingsHandler::OnRequest(HttpRequest& request, HttpResponse& response)
 void SettingsHandler::OnSetFreePanel(HttpRequest& request, HttpResponse& response)
 {
     const char *port = request.GetParameter("port");
-    if (port == nullptr || !CheckDigit(port)) {
-        response.Write("not port0");
+    if (port == nullptr || !check_digit(port)) {
+        response.Write("0");
         return;
     }
     const char *apacheDir = AppConfig::GetInstance().GetInstalledDir("apache");
     if (!apacheDir) {
-        response.Write("not install0");
+        response.Write("0");
         return;
     }
-    char apacheConfigFile[FILENAME_MAX];
-    sprintf(apacheConfigFile, "%s/conf/httpd.conf", apacheDir);
-    FILE *f = fopen(apacheConfigFile, "r+b");
-    fseek(f, 0, SEEK_END);
-    int fileSize = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    char *buffer = (char *)malloc(fileSize + 1);
-    fread(buffer, 1, fileSize, f);
-    buffer[fileSize] = 0;
-    std::string content(buffer);
-    free(buffer);
 
-    // ServerName 000.000.000.000:0000
-    char newServerName[32];
-    sprintf(newServerName, "ServerName 0.0.0.0:%s", port);
-    std::regex serverNamePattern("ServerName\\s+[\\S]+");
-    content = std::regex_replace(content, serverNamePattern, newServerName);
-    int written = 0;
-    if ((written = fwrite(content.c_str(), 1, content.size(), f)) != content.size()) {
-        std::cerr << "Could not save file(" << apacheConfigFile << "), written " << written << "bytes." << std::endl;
+    const int bufferSize = FILENAME_MAX;
+    char buffer[bufferSize];
+    std::stringstream sbuffer;
+
+    // modify httpd-freepanel.conf
+    FILE *freepanelConf = fopen(FREEPANEL_HTTPD_CONF, "rb");
+    std::string content;
+    while (fread(buffer, 1, bufferSize, freepanelConf)) {
+        content.append(buffer);
     }
-    fclose(f);
-    response.Write(content.c_str());
+    if (!feof(freepanelConf)) {
+        response.Write("Could not read configure.");
+        return;
+    }
+    // match origin port first, use this port to match Listen configure
+    // if not match default port is 80
+    std::regex portPattern("<VirtualHost\\s+([^:]+):(\\d+)>");
+    std::smatch portMatch;
+    std::string oriHost;
+    std::string oriPort = "80";
+    std::string search; // used by std::string::replace
+    if (std::regex_search(content, portMatch, portPattern)) {
+        search = portMatch[0].str();
+        oriHost = portMatch[1].str();
+        oriPort = portMatch[2].str();
+        sbuffer.str("");
+        sbuffer << "<VirtualHost " << oriHost << ":" << port << ">";
+        content.replace(content.find(search), search.size(), sbuffer.str());
+        freopen(nullptr, "wb", freepanelConf);
+        fwrite(content.c_str(), 1, content.size(), freepanelConf);
+        fclose(freepanelConf);
+    } else {
+        response.Write("Could not parse freepanel configure.");
+        fclose(freepanelConf);
+        return;
+    }
+
+    // modify httpd.conf
+    sprintf(buffer, "%s/conf/httpd.conf", apacheDir);
+    FILE *httpdConf = fopen(buffer, "rb");
+    content = "";
+    int read = 0;
+    while (read = fread(buffer, 1, bufferSize, httpdConf)) {
+        content.append(buffer, read);
+    }
+    if (!feof(httpdConf)) {
+        response.Write("Could not read configure.");
+        fclose(httpdConf);
+        return;
+    }
+    // match Listen oriPort and replace it
+    sbuffer.str("");
+    sbuffer << "Listen\\s+" << oriPort << "\\s*";
+    std::string s = sbuffer.str();
+    std::regex listenPattern(sbuffer.str());
+    std::smatch listenMatch;
+    if (std::regex_search(content, listenMatch, listenPattern)) {
+        search = listenMatch[0].str();
+        sbuffer.str("");
+        sbuffer << "Listen " << port << std::endl;
+        content.replace(content.find(search), search.size(), sbuffer.str());
+    } else {
+        // not find original Listen configure, add new
+        const char LISTEN_INVOKED[] = "# FREEPANEL_INVOKED_LISTEN";
+        size_t pos = content.find(LISTEN_INVOKED);
+        if (pos == std::string::npos) {
+            response.Write("Could not find listen invoked tag in Apache configure");
+            return;
+        }
+        sbuffer.str("");
+        sbuffer << "Listen " << port << std::endl;   // sizeof(constant) included null-terminal character
+        content.insert(pos + sizeof(LISTEN_INVOKED), sbuffer.str());
+    }
+    int written = 0;
+    httpdConf = freopen(nullptr, "wb", httpdConf);
+    if ((written = fwrite(content.c_str(), 1, content.size(), httpdConf)) != content.size()) {
+        response.Write("Could not save httpd configure.");
+    }
+    fclose(httpdConf);
+
+    // restart httpd
+    std::string cmd(apacheDir);
+    cmd.append("/bin/apachectl -kgraceful");
+    exec_command(cmd.c_str());
+    response.Write("success");
 }
 
