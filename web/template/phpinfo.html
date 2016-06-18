@@ -1,0 +1,41 @@
+<@layout name="layout" />
+<@include file="function/common.php" />
+
+{% block tag_head_end %}
+<style>
+#main-content
+{
+    overflow-x: hidden;
+}
+
+tr>td
+{
+    white-space: normal;
+    word-break: break-all;
+    width: auto;
+}
+
+tr>td:first-child
+{
+    white-space: nowrap;
+    word-break: normal;
+}
+
+tr>td:last-child
+{
+    width: auto;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<?php
+ob_start();
+phpinfo();
+$pageSource = ob_get_clean();
+$pageSource = preg_replace('/<!DOCTYPE[^>]*>[\s\S]+<body>/', '', $pageSource);
+$pageSource = str_replace('</body></html>', '', $pageSource);
+$pageSource = str_replace('<table>', '<table class="pure-table pure-table-horizontal">', $pageSource);
+echo $pageSource;
+?>
+{% endblock %}

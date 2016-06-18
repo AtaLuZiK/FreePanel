@@ -1,0 +1,136 @@
+<@layout name="layout" />
+{% block tag_head_end %}
+<link rel="stylesheet" href="__STATIC_URL__/loading.css">
+<style>
+.pure-control-group>.desc
+{
+    margin-left: 16px;
+}
+
+.pure-control-group>input
+{
+    width: 33.3%;
+}
+
+#alert-list
+{
+    position: fixed;
+    top: 0;
+    width: calc(100% - 254px);
+}
+
+.alert
+{
+    transition: all 1.2s ease;
+    position: absolute;
+    width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+    <div class="pure-u-1">
+        <div id="freepaneld" class="panel">
+            <div class="head">freepaneld服务</div>
+            <form data-parent="#freepaneld" class="pure-form pure-form-aligned" method="post" action="<?=make_url('save')?>?type=freepaneld">
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="freepaneld_hostname">主机名</label>
+                        <input id="freepaneld_hostname" name="hostname" type="text" placeholder="127.0.0.1" value="{##@FREEPANELD.HOSTNAME##}" required>
+                        <span class="desc">freepaneld监听IP，默认使用127.0.0.1</span>
+                    </div>
+
+                    <div class="pure-control-group">
+                        <label for="freepaneld_port">端口号</label>
+                        <input id="freepaneld_port" name="port" type="text" placeholder="8999" value="{##@FREEPANELD.PORT##}" required pattern="\d+">
+                        <span class="desc">如需远程连接，请在防火墙(iptables)开放该端口</span>
+                    </div>
+                    <div class="pure-controls">
+                        <button type="submit" class="pure-button pure-button-primary">保存</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <!-- panel settings -->
+        <div id="freepanel" class="panel">
+            <div class="head">FreePanel面板</div>
+            <form data-parent="#freepanel" class="pure-form pure-form-aligned" method="post" action="<?=make_url('save')?>?type=freepanel">
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="freepanel_port">端口号</label>
+                        <input id="freepanel_port" name="port" type="text" value="<?=get_request_parameter('server.SERVER_PORT')?>" required pattern="\d+">
+                        <span class="desc">如需远程连接，请在防火墙(iptables)开放该端口</span>
+                    </div>
+                    <div class="pure-controls">
+                        <button type="submit" class="pure-button pure-button-primary">保存</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div id="alert-list" data->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tag_body_end %}
+<script type="text/javascript">
+$(function() {
+    var LoadState = {
+        create: function(selector) {
+            var state = {};
+            var elemObj = $(selector);
+            var loading = $('<div class="loading"></div>');
+            var loadingLayer = $('<div class="loading-layer"></div>');
+            var shapes = '<div class="rectangle"></div><div class="rectangle"></div><div class="rectangle"></div><div class="rectangle"></div><div class="rectangle"></div><div class="rectangle"></div><div class="rectangle"></div><div class="rectangle"></div>';
+            loadingLayer.height(elemObj.height());
+            elemObj.prepend(loading.append(loadingLayer.append(shapes)));
+            return loading;
+        }
+    };
+
+    var MsgMnger = {
+        post: function(msg, addClass, timeout) {
+            var alertObj = $('<div class="alert"></div>');
+            if (addClass) {
+                alertObj.addClass(addClass);
+            }
+            alertObj.text(msg);
+            $('#alert-list').append(alertObj);
+            setTimeout(function() {
+                alertObj.css({
+                    transform: 'translateY(50px)'
+                });
+                if (timeout) {
+                    setTimeout(function() {
+                        alertObj.remove();
+                    }, timeout);
+                }
+            }, 1);
+        }
+    };
+    $("form").submit(function(event) {
+        event.preventDefault();
+        var loadState = LoadState.create($(this).data("parent"));
+        $.post({
+            url: $(this).attr("action"),
+            data: $(this).serialize(),
+            method: $(this).attr('method'),
+        }).done(function(data) {
+            loadState.remove();
+            if (data.success) {
+                MsgMnger.post("保存成功", "success", 3000);
+                if (data.redirect) {
+                    setTimeout(function() {
+                        window.location = data.redirect;
+                    }, 3000);
+                }
+            } else {
+                MsgMnger.post(data.message, "danger", 5000);
+            };
+        });
+    });
+});
+</script>
+{% endblock %}

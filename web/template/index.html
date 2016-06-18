@@ -1,0 +1,98 @@
+<@layout name="layout" />
+<@include file="function/common.php" />
+
+{% block tag_head_end %}
+<style>
+.progress
+{
+    position: relative;
+}
+.progress>span
+{
+    content: attr(data-value) '/' attr(data-max);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: #111;
+}
+
+#system-table th
+{
+    text-align: left;
+}
+
+#system-table tr:last-child>th
+{
+    border-bottom: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+    <div class="pure-u-md-1 pure-u-lg-1-3">
+        <div class="panel">
+            <div class="head">系统信息</div>
+            <!--div class="body"-->
+                <table id="system-table" class="pure-table pure-table-horizontal">
+                    <tbody>
+                        <tr>
+                            <th>操作系统</th>
+                            <td><?=php_uname('s'), " ", php_uname('r')?></td>
+                        </tr>
+                        <tr>
+                            <th>主机名</th>
+                            <td><?=php_uname('n')?></td>
+                        </tr>
+                        <tr>
+                            <th>系统时间</th>
+                            <td><?=strftime('%Y-%m-%d %H:%M:%S')?></td>
+                        </tr>
+                        <tr>
+                            <th>在线时间</th>
+                            <td><?=get_uptime()?></td>
+                        </tr>
+                        <tr>
+                            <th>freepaneld</th>
+                            <td><?=$freepaneld->version?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            <!--/div-->
+        </div>
+    </div>
+    <div class="pure-u-md-1  pure-u-lg-2-3">
+        <div class="panel">
+            <div class="head">磁盘信息</div>
+            <table class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>分区</th>
+                        <th>挂载点</th>
+                        <th>使用情况</th>
+                    </tr>
+                <tbody>
+                    <?php foreach($partitions as $partition): ?>
+                    <tr>
+                        <td><?=$partition->device;?></td>
+                        <td><?=$partition->mountPoint;?></td>
+                        <td style="width: 100%;">
+                            <div class="progress" data-value="<?=friendlySize($partition->usedSize)?>" data-max="<?=friendlySize($partition->totalSize, 0)?>">
+                                <span>
+                                    <?=friendlySize($partition->usedSize)?>
+                                    /
+                                    <?=friendlySize($partition->totalSize, 0)?>
+                                </span>
+                                <div class="block" style="width: <?=(($partition->usedSize / $partition->totalSize) * 100)?>%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

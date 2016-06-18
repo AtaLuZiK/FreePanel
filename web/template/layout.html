@@ -1,0 +1,81 @@
+<@include file="common/constant.php" />
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FreePanel{% endblock %}</title>
+    <link rel="stylesheet" href="__STATIC_URL__/normalize.css">
+    <link rel="stylesheet" href="__STATIC_URL__/pure-0.6.0/pure-min.css">
+    <link rel="stylesheet" href="__STATIC_URL__/pure-0.6.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="__STATIC_URL__/common.css">
+    {% block tag_head_end %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="top-menu pure-menu pure-menu-horizontal">
+            <a class="pure-menu-heading">FreePanel</a>
+            <ul class="pure-menu-list pull-right">
+                <li><a class="pure-menu-link" href="<?=ENTRY_URL?>">仪表盘</a></li>
+                <li><a class="pure-menu-link danger" href="#">登出</a></li>
+            </ul>
+            <div style="clear: both"></div>
+        </div>
+        <div style="height: 45px;"></div>
+    </header>
+    <div id="page-content">
+        <nav id="left-menu">
+            <div class="pure-menu">
+                <ul class="pure-menu-list">
+                    <li><a href="<?=ENTRY_URL?>" class="pure-menu-link">后台首页</a></li>
+                </ul>
+            </div>
+            <div class="pure-menu">
+                <h4>系统</h4>
+                <ul class="pure-menu-list">
+                    <li><a href="<?=make_url('System/settings')?>" class="pure-menu-link">设置</a></li>
+                    <li><a href="<?=make_url('System/logs')?>" class="pure-menu-link">系统日志</a></li>
+                </ul>
+            </div>
+            <div class="pure-menu">
+                <h4>网站管理</h4>
+                <ul class="pure-menu-list">
+                    <li><a href="<?=make_url('Site/create')?>" class="pure-menu-link">新建站点</a></li>
+                    <li><a href="<?=make_url('Site/list')?>" class="pure-menu-link">站点列表</a></li>
+                </ul>
+            </div>
+            <div class="pure-menu">
+                <h4>PHP</h4>
+                <ul class="pure-menu-list">
+                    <li><a href="<?=make_url('Php/settings')?>" class="pure-menu-link">PHP设置</a></li>
+                    <li><a href="<?=make_url('Php/info')?>" class="pure-menu-link">PHPinfo()</a></li>
+                </ul>
+            </div>
+            <div class="pure-menu">
+                <h4>MYSQL</h4>
+                <ul class="pure-menu-list">
+                    <li><a href="<?=make_url('Mysql/create')?>" class="pure-menu-link">新建数据库</a></li>
+                    <li><a href="<?=make_url('Mysql/list')?>" class="pure-menu-link">数据库列表</a></li>
+                    <li><a href="<?=make_url('Mysql/chrootpwd')?>" class="pure-menu-link">修改root密码</a></li>
+                    <li><a href="<?=make_url('Mysql/phpmyadmin')?>" class="pure-menu-link">phpmyadmin</a></li>
+                </ul>
+            </div>
+            <div class="pure-menu">
+                <h4>FTP管理</h4>
+                <ul class="pure-menu-list">
+                    <li><a href="<?=make_url('Ftp/create')?>" class="pure-menu-link">创建FTP帐号</a></li>
+                    <li><a href="<?=make_url('Ftp/list')?>" class="pure-menu-link">FTP帐号列表</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div id="main-content" class="content">
+            {% block content %}{% endblock %}
+            <footer>
+                &copy; 2016
+            </footer>
+        </div>
+    </div>
+    <script type="text/javascript" src="__STATIC_URL__/jquery-3.0.0.min.js"></script>
+    {% block tag_body_end %}{% endblock %}
+</body>
+</html>
