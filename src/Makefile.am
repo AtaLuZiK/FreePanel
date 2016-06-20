@@ -1,5 +1,5 @@
 bin_PROGRAMS = freepaneld
-freepaneld_LDADD = ${PTHREAD_LIBS} ${LIBCONFIGXX_LIBS}
+freepaneld_LDADD = ${PTHREAD_LIBS} ${LIBCONFIGXX_LIBS} ${LIBLOG4CXX_LIBS}
 freepaneld_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
 freepaneld_CXXFLAGS = \
     -I$(top_srcdir)/thirdparty/rapidjson/include \
@@ -21,5 +21,4 @@ freepaneld_SOURCES = \
     Handler.h \
     HttpPacket.h \
     ${freepaneld_util_SOURCES} ${freepaneld_handler_SOURCES}
-
 

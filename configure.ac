@@ -12,6 +12,7 @@ AC_PROG_CC
 # Checks for libraries.
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4], , AC_MSG_ERROR([libconfig++ 1.4 or newer not found.]))
 AX_PTHREAD()
+AC_LOG4CXX_CHECK()
 
 # Checks for header files.
 AC_CHECK_HEADERS([netinet/in.h stdlib.h sys/socket.h syslog.h unistd.h])
@@ -49,7 +50,5 @@ AC_ARG_WITH([php-dir], AS_HELP_STRING([--with-php-dir], [Set the path where PHP 
         ), 
     AC_SUBST([PHP_INSTALL_DIR])
     )
-config_in_files=etc/freepaneld.cfg
 AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
-AC_CONFIG_FILES([$config_in_files])
 AC_OUTPUT
