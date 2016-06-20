@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -u
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
 CURRENT_DIR=$(pwd)
@@ -87,7 +88,7 @@ function Install()
 function InstallMysql()
 {
     MYSQL_INSTALL_DIR=/usr/local/mysql
-    if [ "$1" == "uninstall" ]; then
+    if [ "${1:-install}" == "uninstall" ]; then
         echo "Uninstalling MySQL"
         /etc/init.d/mysql stop
         pkill mysqld
@@ -113,13 +114,14 @@ function InstallMysql()
             ExtractFile "$DOWNLOAD_DIR/boost_1_59_0.tar.gz" $CURRENT_DIR
         fi
         cd $CURRENT_DIR/mysql*
+        cmake -DCMAKE_INSTALL_PREFIX=${MYSQL_INSTALL_DIR} -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_BOOST=$CURRENT_DIR/boost_1_59_0
+        make && make install || { echo 'Failed to install MySQL'; exit 1; }
         groupadd mysql
         useradd -r -g mysql -s /bin/false mysql
-        cmake -DCMAKE_INSTALL_PREFIX=${MYSQL_INSTALL_DIR} -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=complex -DWITH_READLINE=1 -DENABLED_LOCAL_INFILE=1 -DWITH_BOOST=$CURRENT_DIR/boost_1_59_0
-        make && make install
-        cd /usr/local/mysql
-        chown -R mysql .
-        chgrp -R mysql .
+        cd ${MYSQL_INSTALL_DIR}
+        chown -R mysql.mysql ${MYSQL_INSTALL_DIR}
+        mkdir /etc/mysql
+        cp ${MYSQL_INSTALL_DIR}/support-files/my-default.cnf /etc/mysql/my.cnf
         sed -i "s/skip-locking/skip-external-locking/g" /etc/mysql/my.cnf
         sed -i "s:#innodb:innodb:g" /etc/mysql/my.cnf
         mkdir ${MYSQL_INSTALL_DIR}/data
@@ -148,6 +150,7 @@ EOF
         DROP USER ''@'%';
         FLUSH PRIVILEGES;
 EOF
+        systemctl daemon-reload
         PrintSuccess "MySQL install completed."
     else
         PrintSuccess "MySQL installed."
@@ -158,7 +161,7 @@ EOF
 function InstallPHP()
 {
     PHP_INSTALL_DIR=/usr/local/php
-    if [ "$1" == "uninstall" ]; then
+    if [ "${1:-install}" == "uninstall" ]; then
         echo "Uninstalling PHP"
         rm -rf ${PHP_INSTALL_DIR}
         return 0
@@ -174,8 +177,7 @@ function InstallPHP()
         cd $CURRENT_DIR/$PHP_FILENAME
         ./buildconf --force
         ./configure --prefix=${PHP_INSTALL_DIR} --with-apxs2=${HTTPD_INSTALL_DIR}/bin/apxs --with-config-file-path=${PHP_INSTALL_DIR}/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-pdo-mysql=/usr/local/mysql --with-iconv-dir --with-freetype-dir=/usr/local/freetype --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --enable-discard-path --enable-magic-quotes --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl=/usr/local/curl --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --enable-ftp --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --with-gettext --with-mime-magic
-        make ZEND_EXTRA_LIBS='-liconv'
-        make install
+        make ZEND_EXTRA_LIBS='-liconv' && make install || { echo 'Failed to install PHP'; exit 1; }
         libtool --finish $CURRENT_DIR/$PHP_FILENAME/libs
         cp php.ini-production ${PHP_INSTALL_DIR}/etc/php.ini
         # php extensions
@@ -215,7 +217,7 @@ function InstallPureFTPd()
 function InstallApache()
 {
     HTTPD_INSTALL_DIR=/usr/local/apache2
-    if [ "$1" == "uninstall" ]; then
+    if [ "${1:-install}" == "uninstall" ]; then
         echo "Uninstalling Apache"
         ${HTTPD_INSTALL_DIR}/bin/apachectl stop
         pkill httpd
@@ -237,7 +239,7 @@ function InstallApache()
 
 	    cd $CURRENT_DIR/$HTTPD_FILENAME
 	    ./configure --prefix=${HTTPD_INSTALL_DIR} --enable-mods-shared=most --enable-headers --enable-mime-magic --enable-proxy --enable-so --enable-rewrite --with-ssl --enable-ssl --enable-deflate --with-pcre --with-included-apr --with-apr-util --enable-mpms-shared=all --with-mpm=prefork --enable-remoteip
-	    make && make install
+	    make && make install || { echo 'Failed to install Apache'; exit 1; }
         libtool --finish ${HTTPD_INSTALL_DIR}/lib
         cp $CURRENT_DIR/etc/httpd.conf.in ${HTTPD_INSTALL_DIR}/conf/httpd.conf
         sed -i 's#@HTTPD_INSTALL_DIR@#'$HTTPD_INSTALL_DIR'#g' ${HTTPD_INSTALL_DIR}/conf/httpd.conf
@@ -258,7 +260,7 @@ function InstallApache()
 function InstallFreePanel()
 {
     FREEPANEL_INSTALL_DIR=/usr/local/freepanel
-    if [ "$1" == "uninstall" ]; then
+    if [ "${1:-install}" == "uninstall" ]; then
         echo "Uninstalling FreePanel"
         rm -rf ${FREEPANEL_INSTALL_DIR}
         return 0
