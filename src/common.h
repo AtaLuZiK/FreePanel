@@ -4,10 +4,9 @@
 #include <cstring>
 #include <string>
 
-#define die_error(message, arg...)  \
+#define die_error(message)  \
 {    \
-    syslog(LOG_ERR, message, ##arg);   \
-    closelog(); \
+    FPLOG_FATAL(message);   \
     exit(EXIT_FAILURE); \
 }
 

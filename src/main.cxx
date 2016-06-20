@@ -8,11 +8,18 @@
 #include <getopt.h>
 #include <iostream>
 #include <unistd.h>
+#include <log4cxx/logger.h>
+#include <log4cxx/propertyconfigurator.h>
+#include <log4cxx/helpers/exception.h>
 #include "freepaneld.h"
 #include "Server.h"
 #include <map>
 #include "AppConfig.h"
 
+#define LOGGER_CONF SYSCONFDIR"/freepaneld-log.properties"
+
+log4cxx::LoggerPtr _logger(log4cxx::Logger::getLogger(DAEMON_NAME));
+DECLARE_FP_LOGGER()
 
 static struct option daemonOptions[] = {
     { "port", optional_argument, 0, 'p' },
@@ -32,8 +39,11 @@ void usage()
 
 int main(int argc, char *argv[])
 {
+    // initialize logger
+    log4cxx::PropertyConfigurator::configure(LOGGER_CONF);
+    FPLOG_INFO(DAEMON_NAME" started")
     if (getuid()) {
-        std::cerr << "!!!freepaneld not run as root!!!" << std::endl;
+        FPLOG_ERROR("!!!freepaneld not run as root!!!")
     }
     u_short serverPort = 0;
     while (true) {
@@ -63,10 +73,6 @@ int main(int argc, char *argv[])
             break;
         }
     }
-
-    setlogmask(LOG_UPTO(LOG_NOTICE));
-    openlog(DAEMON_NAME, LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
-
     // close(STDIN_FILENO);
     // close(STDOUT_FILENO);
     // close(STDERR_FILENO);
@@ -79,8 +85,6 @@ int main(int argc, char *argv[])
     appConfig.Save();
     Server server;
     server.Run(serverPort);
-
-    closelog();
     return EXIT_SUCCESS;
 }
 

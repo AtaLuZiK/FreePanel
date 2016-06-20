@@ -15,6 +15,8 @@
 #include "HttpPacket.h"
 #include "util/URLEncoder.h"
 
+DECLARE_FP_LOGGER()
+
 ///////////////////////////////////////////////////////////////////////////////
 // HttpPacketImpl class
 
@@ -295,7 +297,7 @@ int Server::Run(u_short port)
 {
     u_short listenPort = port;
     int listenSocket = Start(listenPort);
-    syslog(LOG_NOTICE, "freepaneld running on port port %d", listenPort);
+    FPLOG_INFO("freepaneld running on port port " << listenPort)
     while (true) {
         struct sockaddr_in clientName;
         unsigned int clientNameSize = sizeof(clientName);
@@ -345,7 +347,7 @@ void *Server::HandleConnection(int client)
     
     if (strcasecmp(method, "GET") && strcasecmp(method, "POST")) {
         // TODO: unimplemented(client);
-        syslog(LOG_ERR, "Error method: %s", method);
+        FPLOG_ERROR("Error method: " << method);
         return NULL;
     }
 
@@ -413,7 +415,7 @@ int Server::Start(u_short& port)
     name.sin_addr.s_addr = htonl(INADDR_ANY);
     if (bind(httpd, (struct sockaddr *)&name, sizeof(name)) < 0) {
         char *msg = strerror(errno);
-        die_error("bind error, %s", msg);
+        die_error("bind error, " << msg);
     }
     if (port == 0) {
         unsigned int namelen = sizeof(name);
@@ -422,7 +424,7 @@ int Server::Start(u_short& port)
         port = ntohs(name.sin_port);
     }
     if (listen(httpd, 5) < 0) {
-        die_error("listen error, %s", strerror(errno));
+        die_error("listen error, " << strerror(errno));
     }
     return httpd;
 }
