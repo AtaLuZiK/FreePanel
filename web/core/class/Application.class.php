@@ -12,7 +12,7 @@ class Application
     {
         require CORE_PATH . 'function/common.php';
         // set exception handlers
-        error_reporting(E_ALL);
+        DEBUG_MODE ? error_reporting(E_ALL) : error_reporting(E_ALL ^ E_WARNING);
         spl_autoload_register(__CLASS__ . '::autoload');
         //spl_autoload_register(__CLASS__ . '::loadUserController');
         //register_shutdown_function(__CLASS__ . '::handleFatal');
@@ -275,6 +275,8 @@ class Application
     
     public function handleError($errno, $errmsg, $errfile, $errline)
     {
+        if (!(error_reporting() & $errno))  // This error code is not included in error_reporting
+            return;
         $message = "$errmsg ($errfile, Line: $errline)";
         self::showErrorPage($message);
     }
