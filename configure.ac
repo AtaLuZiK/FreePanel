@@ -15,7 +15,7 @@ AX_PTHREAD()
 AC_LOG4CXX_CHECK()
 
 # Checks for header files.
-AC_CHECK_HEADERS([netinet/in.h stdlib.h sys/socket.h syslog.h unistd.h])
+AC_CHECK_HEADERS([netinet/in.h stdlib.h sys/socket.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
