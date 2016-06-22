@@ -50,3 +50,16 @@ bool check_digit(const char *s)
     return true;
 }
 
+
+char *dump_memory(const void *mem, size_t sizeInBytes)
+{
+    const unsigned char *data = (const unsigned char *)mem;
+    int bufferSize = sizeInBytes * 3;
+    char *recvHexData = (char *)malloc(bufferSize);
+    char *p = recvHexData;
+    for (int i = 0; i < sizeInBytes; ++i, p += 3) {
+        sprintf(p, "%02X ", data[i]);
+    }
+    recvHexData[bufferSize] = 0;
+    return recvHexData;
+}

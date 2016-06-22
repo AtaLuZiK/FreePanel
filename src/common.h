@@ -18,5 +18,7 @@ char *rtrim(char *string);
 
 bool check_digit(const char *s);
 
+char *dump_memory(const void *mem, size_t sizeInBytes);
+
 #endif
 

@@ -20,5 +20,6 @@ freepaneld_SOURCES = \
     Server.h Server.cxx \
     Handler.h \
     HttpPacket.h \
+    FPPacket.h FPPacket.cxx \
     ${freepaneld_util_SOURCES} ${freepaneld_handler_SOURCES}
 

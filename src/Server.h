@@ -1,6 +1,7 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 #include "HandlerFactory.h"
+#include "FPPacket.h"
 
 class Server
 {
@@ -32,6 +33,16 @@ protected:
     } Connection;
 
     void DispatchRequest(int clientSocket, const char *method, const char *url, const char *queryString);
+
+    /**
+     *
+     * @param clientSocket
+     * @return returns non-zero to disconnect
+     */
+    int DispatchPacket(int clientSocket);
+
+    int HandleTestCommand(int clientSocket, FPPacket *pPacket);
+    int HandleDisconnectCommand(int clientSocket, FPPacket *pPacket);
 
 private:
     static void *StartHandleConnection(void *socket);
