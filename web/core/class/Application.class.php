@@ -14,7 +14,6 @@ class Application
         // set exception handlers
         DEBUG_MODE ? error_reporting(E_ALL) : error_reporting(E_ALL ^ E_WARNING);
         spl_autoload_register(__CLASS__ . '::autoload');
-        //spl_autoload_register(__CLASS__ . '::loadUserController');
         //register_shutdown_function(__CLASS__ . '::handleFatal');
         set_error_handler(array($this, 'handleError'));
         set_exception_handler(array($this, 'handleException'));
@@ -126,10 +125,15 @@ class Application
         // invoke action
         $this->loadUserController($controllerName);
         $controllerClass = new $controllerName();
-        if (method_exists($controllerClass, $actionName))
-            $controllerClass->$actionName();
-        else
-            $controllerClass->_empty($actionName);
+        method_exists($controllerClass, '_before') && call_user_func_array(array($controllerClass, '_before'), array($actionName));
+        if (method_exists($controllerClass, $actionName)) {
+            method_exists($controllerClass, '_before' . $actionName) && call_user_func_array(array($controllerClass, '_before' . $actionName), array());
+            call_user_func_array(array($controllerClass, $actionName), array());
+            method_exists($controllerClass, '_after' . $actionName) && call_user_func_array(array($controllerClass, '_after' . $actionName), array());
+        } else {
+            call_user_func_array(array($controllerClass, '_empty'), array($actionName));
+        }
+        method_exists($controllerClass, '_after') && call_user_func_array(array($controllerClass, '_before'), array($actionName));
     }
     
     
