@@ -32,7 +32,7 @@ function get_config($name = null, $default = null)
 
 function get_request_parameter($name, $default = null, $filters = null)
 {
-    return $GLOBALS['theApp']->getRequestParameter($name, $default);
+    return $GLOBALS['theApp']->getRequestParameter($name, $default, $filters);
 }
 
 
