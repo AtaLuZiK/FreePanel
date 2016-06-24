@@ -1,7 +1,7 @@
 <?php
 defined('BASE_PATH') || exit('No direct script access allowed');
 
-class PhpController extends \system\TemplateController
+class PhpController extends AuthorizedController
 {
     public function info()
     {

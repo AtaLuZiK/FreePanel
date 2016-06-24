@@ -28,6 +28,16 @@ html, body {
     border-radius: 0;
 }
 
+.pure-button:hover, .pure-button:focus {
+    border: #c7c7c7;
+    background: #d4d4d4;
+}
+
+.pure-button:active {
+    box-shadow: none;
+    background: #c2c2c2;
+}
+
 .pure-g
 {
     letter-spacing: normal;
@@ -43,6 +53,22 @@ html, body {
     display: inline-block;
     zoom: 1;
     vertical-align: middle;
+}
+
+
+.pure-u-centered {
+    margin: 0 auto;
+}
+
+.pure-form {
+    width: 100%;
+}
+
+
+label, .pure-form label {
+    display: inline-block;
+    margin-bottom: 5px;
+    font-weight: 700;
 }
 
 /******** table ********/
@@ -107,125 +133,9 @@ ul.pure-menu-list>li
     height: 100%;
 }
 
-#page-content
-{
-    padding-left: 200px;    /* reference #left-menu */
-}
-
-#main-content>footer
-{
-    clear: both;
-    text-align: center;
-    color: #888;
-    font-size: 10px !important;
-    padding: .8em 0;
-    bottom: 0;
-    border-top: 1px solid #b6c0cd;
-}
-
-/******** top menu ********/
-.top-menu
-{
-    background: rgba(240, 242, 244, 0.86);
-    padding: 0.5em;
-    position: fixed;
-    z-index: 1000;
-    border-bottom: 1px solid #ddd;
-}
-
-.top-menu .pure-menu-heading
-{
-    color: #666;
-    font-weight: bold;
-    font-size: 120%;
-}
-
-.top-menu .pure-menu-list
-{
-    line-height: 1.5em;
-}
-
-.top-menu a.pure-menu-link
-{
-    color: #0f3e4e;
-}
-
-.top-menu a.pure-menu-link.danger
-{
-    color: #cc0000;
-}
-
-.top-menu a.pure-menu-link:hover
-{
-    color: #111;
-    background: none;
-}
-
 .pull-right
 {
     float: right !important;
-}
-
-/******** left menu ********/
-#left-menu
-{
-    background: #f7f8fa;
-    border-right: 1px solid #b6c0cd;
-    position: fixed;
-    left: 200px;
-    margin-left: -200px;
-    width: 200px;
-    top: 0;
-    bottom: 0;
-    margin-top: 45px;
-    height: auto;
-    overflow-y: auto;
-}
-
-#left-menu ul.pure-menu-list>li
-{
-    margin: 2px 0 2px 10px;
-    padding: 0;
-}
-
-#left-menu>.pure-menu
-{
-    margin: 0 15px;
-    padding: 15px 0 15px 5px;
-    border-bottom: 1px solid #e1e7f0;
-    border-top: 1px solid #fff;
-}
-
-#left-menu>.pure-menu:first-child
-{
-    border-top: 0!important;
-    padding-top: 8px;
-}
-
-#left-menu>.pure-menu:last-child
-{
-    border-bottom: 0!important;
-}
-
-#left-menu>.pure-menu>h4
-{
-    font-weight: 700;
-    margin: 0;
-    padding: 0 0 0 20px;
-    color: #626976;
-    font-size: 13px;
-}
-
-/******** main content ********/
-#main-content
-{
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 200px;
-    right: 0;
-    margin-top: 45px;
-    overflow: auto;
 }
 
 .progress
@@ -272,4 +182,74 @@ ul.pure-menu-list>li
 {
     background: #dd514c;
     border-color: #d83832;
+}
+
+.pagination {
+    display: inline-block;
+    padding-left: 0;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.pagination>li {
+    display: inline;
+}
+
+.pagination>li>a, .pagination>li>span {
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    margin-left: -1px;
+    line-height: 1.42857143;
+    color: #337ab7;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.pagination>li:first-child>a, 
+.pagination>li:first-child>span {
+    margin-left: 0;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.pagination>li>a:focus, 
+.pagination>li>a:hover, 
+.pagination>li>span:focus, 
+.pagination>li>span:hover {
+    z-index: 2;
+    color: #23527c;
+    background-color: #eee;
+    border-color: #ddd;
+}
+
+.pagination>.active>a, 
+.pagination>.active>a:focus, 
+.pagination>.active>a:hover, 
+.pagination>.active>span, 
+.pagination>.active>span:focus, 
+.pagination>.active>span:hover {
+    z-index: 3;
+    color: #fff;
+    cursor: default;
+    background-color: #337ab7;
+    border-color: #337ab7;
+    pointer-events: none;
+}
+
+.pagination>.disabled>a, 
+.pagination>.disabled>a:focus, 
+.pagination>.disabled>a:hover, 
+.pagination>.disabled>span, 
+.pagination>.disabled>span:focus, 
+.pagination>.disabled>span:hover {
+    color: #777;
+    cursor: not-allowed;
+    background-color: #fff;
+    border-color: #ddd;
+}
+
+.disabled> * {
+    pointer-events: none;
 }

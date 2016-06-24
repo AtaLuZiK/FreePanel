@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="__STATIC_URL__/pure-0.6.0/pure-min.css">
     <link rel="stylesheet" href="__STATIC_URL__/pure-0.6.0/grids-responsive-min.css">
     <link rel="stylesheet" href="__STATIC_URL__/common.css">
+    <link rel="stylesheet" href="__STATIC_URL__/freepanel.css">
     {% block tag_head_end %}{% endblock %}
 </head>
 <body>
@@ -17,7 +18,7 @@
             <a class="pure-menu-heading">FreePanel</a>
             <ul class="pure-menu-list pull-right">
                 <li><a class="pure-menu-link" href="<?=ENTRY_URL?>">仪表盘</a></li>
-                <li><a class="pure-menu-link danger" href="#">登出</a></li>
+                <li><a class="pure-menu-link danger" href="<?=make_url('Index/logout')?>">登出</a></li>
             </ul>
             <div style="clear: both"></div>
         </div>

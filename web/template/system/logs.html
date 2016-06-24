@@ -1,0 +1,48 @@
+<@layout name="layout" />
+{% block tag_head_end %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+    <div class="pure-u-1">
+        <?php if (!empty($logs)): ?>
+        <table class="pure-table pure-table-horizontal">
+            <thead>
+                <tr>
+	                <th>Date</th>
+	                <th>Type</th>
+	                <th>User</th>
+	                <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($logs as $log): ?>
+                <tr>
+                    <td><?=date("Y-m-d H:i:s", $log['date'])?></td>
+                    <td><?=Logger::toLevelStr($log['type'])?></td>
+                    <td><?=$log['user']?></td>
+                    <td><?=$log['text']?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
+    </div>
+    <div class="pure-u-1">
+        <nav>
+            <ul class="pagination">
+                <li class="<?=$page == 1 ? 'disabled' : ''?>"><a href="?page=1"><span>&laquo;</span></a></li>
+                <?php for ($i = 1; $i <= $totalPage; ++$i): ?>
+                <li class="<?=$page == $i ? 'active' : ''?>"><a href="?page=<?=$page?>"><?=$page?></a></li>
+                <?php endfor; ?>
+                <li class="<?=$page == $totalPage ? 'disabled' : ''?>"><a href="?page=<?=$totalPage?>"><span>&raquo;</span></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block tag_body_end %}
+{% endblock %}

@@ -1,0 +1,179 @@
+<@include file="common/constant.php" />
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login Page | Amaze UI Example</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="__STATIC_URL__/normalize.css">
+<link rel="stylesheet" href="__STATIC_URL__/pure-0.6.0/pure-min.css">
+<link rel="stylesheet" href="__STATIC_URL__/pure-0.6.0/grids-responsive-min.css">
+<link rel="stylesheet" href="__STATIC_URL__/common.css">
+<style>
+html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    font-size: 10px;
+}
+
+body {
+    margin: 0;
+    background: #fff;
+    font-family: "Segoe UI","Lucida Grande",Helvetica,Arial,"Microsoft YaHei",FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",FontAwesome,sans-serif;
+    font-weight: 400;
+    color: #333;
+    font-size: 1.6rem;
+}
+
+.pure-g, .pure-g [class *="pure-u"] {
+    font-family: "Segoe UI","Lucida Grande",Helvetica,Arial,"Microsoft YaHei",FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",FontAwesome,sans-serif;
+}
+
+address, blockquote, dl, fieldset, figure, hr, ol, p, pre, ul {
+    margin: 0 0 1.6rem;
+}
+
+hr, iframe, img, legend {
+    border: 0;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, hr, main, menu, nav, section, summary {
+    display: block;
+}
+
+hr, legend, td, th {
+    padding: 0;
+}
+
+hr {
+    height: 0;
+    border-top: 1px solid #eee;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+*+address, *+blockquote, *+dl, *+fieldset, *+figure, *+hr, *+ol, *+p, *+pre, *+ul {
+    margin-top: 1.6rem;
+}
+
+.header {
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 200%;
+    color: #333;
+    margin-top: 30px;
+}
+
+.header p {
+    font-size: 14px;
+}
+
+.pure-form input[type=number]:focus
+, .pure-form input[type=search]:focus
+, .pure-form input[type=text]:focus
+, .pure-form input[type=password]:focus
+, .pure-form input[type=datetime]:focus
+, .pure-form input[type=datetime-local]:focus
+, .pure-form input[type=date]:focus
+, .pure-form input[type=month]:focus
+, .pure-form input[type=time]:focus
+, .pure-form input[type=week]:focus
+, .pure-form input[type=email]:focus
+, .pure-form input[type=url]:focus
+, .pure-form input[type=tel]:focus
+, .pure-form input[type=color]:focus
+, .pure-form select:focus
+, .pure-form textarea:focus
+, .pure-form-field:focus {
+    background-color: #fefffe;
+    border-color: #3bb4f2;
+    box-shadow: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 5px rgba(59,180,242,.3);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 5px rgba(59,180,242,.3);
+}
+
+.pure-form input[type=number]
+, .pure-form input[type=search]
+, .pure-form input[type=text]
+, .pure-form input[type=password]
+, .pure-form input[type=datetime]
+, .pure-form input[type=datetime-local]
+, .pure-form input[type=date]
+, .pure-form input[type=month]
+, .pure-form input[type=time]
+, .pure-form input[type=week]
+, .pure-form input[type=email]
+, .pure-form input[type=url]
+, .pure-form input[type=tel]
+, .pure-form input[type=color]
+, .pure-form select
+, .pure-form textarea
+, .pure-form-field {
+    display: block;
+    width: 100%;
+    padding: .5em;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-appearance: none;
+    -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+}
+</style>
+</head>
+<body>
+    <div class="header">
+        <div class="pure-u-1">
+          <h1>FreePanel</h1>
+          <p>Free and Open-Source Hosting Control Panel</p>
+        </div>
+        <hr />
+    </div>
+    <div class="pure-g">
+        <div class="pure-u-lg-1-2 pure-u-md-2-3 pure-u-centered">
+            <h3>Login</h3>
+            <hr>
+
+            <?php if (isset($message)): ?>
+            <div class="alert <?=$message['success'] ? 'success' : 'danger'?>">
+                <?=$message['message']?>
+            </div>
+            <?php endif; ?>
+            <form id="login-form" class="pure-form pure-form-aligned" method="post">
+                <label for="username">帐号:</label>
+                <input type="text" name="username" id="username" value="">
+                <br>
+                <label for="password">密码:</label>
+                <input type="password" name="password" id="password" value=""> <br>
+                <div>
+                    <button type="submit" class="pure-button pure-button-primary">登录</button>
+                    <a href="#" class="pure-button">忘记密码</a>
+                </div>
+            </form>
+            <hr>
+            <p>&copy; 2016 FreePanel. Licensed under Apache 2.0 license.</p>
+        </div>
+    </div>
+    <script type="text/javascript" src="__STATIC_URL__/jquery-3.0.0.min.js"></script>
+    <script type="text/javascript" src="__STATIC_URL__/md5.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        $('#login-form').submit(function() {
+            var passwodInput = $('#password');
+            passwodInput.val(md5(passwodInput.val()));
+        });
+    });
+    </script>
+</body>
+</html>

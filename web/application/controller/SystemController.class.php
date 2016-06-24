@@ -1,7 +1,7 @@
 <?php
 defined('BASE_PATH') || exit('No direct script access allowed');
 
-class SystemController extends \system\TemplateController
+class SystemController extends AuthorizedController
 {
     public function settings()
     {
@@ -25,7 +25,23 @@ class SystemController extends \system\TemplateController
     }
     
     
-    public function saveFreepaneld()
+    public function logs()
+    {
+        $pageSize = 50;
+        $page = get_request_parameter('page', 1, 'intval');
+        $result_stmt = Database::query('SELECT COUNT(1) FROM `syslog`');
+        $totalRow = intval($result_stmt->fetch(PDO::FETCH_COLUMN));
+        $sql = 'SELECT * FROM `syslog` WHERE id <= (SELECT id FROM `syslog` ORDER BY id desc LIMIT ' . ($page - 1) * $pageSize . ", 1) ORDER BY id desc LIMIT $pageSize";
+        $result_stmt = Database::query($sql);
+        $result = $result_stmt->fetchAll();
+        $this->assign('logs', $result);
+        $this->assign('totalPage', ceil($totalRow / $pageSize));
+        $this->assign('page', $page);
+        $this->display('system/logs');
+    }
+    
+    
+    private function saveFreepaneld()
     {
         $hostname = get_request_parameter('post.hostname');
         $port = get_request_parameter('post.port');
@@ -60,7 +76,7 @@ class SystemController extends \system\TemplateController
     }
     
     
-    public function saveFreepanel()
+    private function saveFreepanel()
     {
         $oldPort = get_request_parameter('server.SERVER_PORT');
         $newPort = get_request_parameter('post.port');
