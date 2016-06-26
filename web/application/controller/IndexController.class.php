@@ -41,6 +41,7 @@ class IndexController extends AuthorizedController
                 $session = [
                     'hash' => md5(uniqid(microtime(), 1)),
                     'userid' => $userinfo['id'],
+                    'username' => $userinfo['username'],
                     'ipaddress' => $remoteAddr,
                     'useragent' => get_request_parameter('server.HTTP_USER_AGENT'),
                     'lastactivity' => time(),
