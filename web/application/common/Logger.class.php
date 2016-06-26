@@ -30,7 +30,7 @@ abstract class Logger {
     static private $loggers = array();
     
     private $name;
-    private $level = LOG_DEBUG;
+    private $level;
     
     /**
      * Get a logger from specified name
@@ -71,7 +71,7 @@ abstract class Logger {
     protected function __construct($name)
     {
         $this->name = $name;
-        $this->setLevel(get_config('LOG.LEVEL', LOG_WARNING));
+        $this->setLevel(get_config('LOG.LEVEL', LOG_INFO));
     }
     
     
