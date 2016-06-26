@@ -32,7 +32,6 @@ class Application
             'post' => &$_POST,
             'server' => &$_SERVER,
             'cookie' => &$_COOKIE,
-            'session' => &$_SESSION,
             'request' => &$_REQUEST
         );
         define('URL_MODE', $this->getConfig('URL_MODE', URL_MODE_PATHINFO));
