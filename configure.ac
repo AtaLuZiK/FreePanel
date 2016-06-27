@@ -29,6 +29,19 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset socket strcasecmp strchr strdup strerror])
 
 AC_PREFIX_DEFAULT(/usr/local/freepanel)
+
+DX_DOXYGEN_FEATURE(ON)
+DX_DOT_FEATURE(ON)
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN($PACKAGE_NAME, [docs/freepaneld.Doxyfile], [docs/freepaneld])
+
 AC_ARG_WITH([apache-dir], AS_HELP_STRING([--with-apache-dir], [Set the path where apache was installed]), 
     AC_CHECK_FILE([$with_php_dir/bin/php], 
         AC_SUBST([APACHE_INSTALL_DIR], [$with_apache_dir]), 

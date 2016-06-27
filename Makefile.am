@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -Im4
-EXTRA_DIST = $(top_srcdir)/thirdparty
+EXTRA_DIST = $(top_srcdir)/thirdparty docs/freepaneld.Doxyfile
 SUBDIRS = . src tests
 dist_sysconf_DATA = etc/freepaneld.cfg etc/freepaneld-log.properties
 
@@ -14,5 +14,14 @@ install-data-hook:
 # freepaneld-log.properties
 	sed -i \
 		-e 's|##LOCALSTATEDIR##|$(localstatedir)|g' $(sysconfdir)/freepaneld-log.properties
-	@./install-sh -d $(localstatedir)/log
+	${install_sh} -d $(localstatedir)/log
+	${install_sh} -d $(sysconfdir)/vhosts
+
+
+@DX_RULES@
+
+docs: doxygen-doc
+.PHONY: docs
+
+MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
