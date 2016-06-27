@@ -5,6 +5,6 @@ class PhpController extends AuthorizedController
 {
     public function info()
     {
-        $this->display('phpinfo');
+        $this->display('php/info');
     }
 }
