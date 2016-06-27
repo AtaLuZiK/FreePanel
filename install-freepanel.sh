@@ -273,7 +273,10 @@ function InstallFreePanel()
     cd $SCRIPT_DIR
     ./configure --prefix=$FREEPANEL_INSTALL_DIR --with-mysql-dir=${MYSQL_INSTALL_DIR} --with-apache-dir=${HTTPD_INSTALL_DIR} --with-php-dir=${PHP_INSTALL_DIR}&& make && make install
     sed 's#@FREEPANEL_INSTALL_DIR@#'$FREEPANEL_INSTALL_DIR'#g' $SCRIPT_DIR/etc/httpd-freepanel.conf.in >$FREEPANEL_INSTALL_DIR/etc/httpd-freepanel.conf
-    sed -i 's|# INCLUDE_FREEPANEL_CONF|Include '$FREEPANEL_INSTALL_DIR'/etc/httpd-freepanel.conf|g' ${HTTPD_INSTALL_DIR}/conf/httpd.conf
+    sed -i \
+        -e 's|# INCLUDE_FREEPANEL_CONF|Include '$FREEPANEL_INSTALL_DIR'/etc/httpd-freepanel.conf|g' \
+        -e 's|# INCLUDE_FREEPANEL_VHOSTS_CONF|IncludeOptional '$FREEPANEL_INSTALL_DIR'/etc/vhosts/*.conf|g' \
+        ${HTTPD_INSTALL_DIR}/conf/httpd.conf
     cp -R $SCRIPT_DIR/web/. $FREEPANEL_INSTALL_DIR/web
     sed -i 's|@MYSQL_PASSWORD@|'${MYSQL_PASSWORD}'|g' ${FREEPANEL_INSTALL_DIR}/web/application/config/database.php
     chown www:www -R $FREEPANEL_INSTALL_DIR/web

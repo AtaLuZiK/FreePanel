@@ -370,4 +370,4 @@ SSLRandomSeed connect builtin
 </IfModule>
 
 # INCLUDE_FREEPANEL_CONF
-IncludeOptional conf/vhosts/*.conf
+# INCLUDE_FREEPANEL_VHOSTS_CONF
