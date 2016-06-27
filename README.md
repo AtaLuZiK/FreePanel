@@ -35,7 +35,7 @@ For more details about **freepaneld** installation, refer to [INSTALL](INSTALL).
 
 ### Building documents
 
-Building documents requires doxygen. Run `make docs` will generate HTML document only by default or other document format run `configure --help' for more details.
+Building documents requires doxygen. Run `make docs` will generate HTML document only by default or other document format run `configure --help` for more details.
 
 ## License
 
