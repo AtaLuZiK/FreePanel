@@ -40,7 +40,10 @@ DX_RTF_FEATURE(OFF)
 DX_XML_FEATURE(OFF)
 DX_PDF_FEATURE(OFF)
 DX_PS_FEATURE(OFF)
-DX_INIT_DOXYGEN($PACKAGE_NAME, [docs/freepaneld.Doxyfile], [docs/freepaneld])
+
+DX_INIT_DOXYGEN($PACKAGE_NAME, 
+    [docs/freepaneld.Doxyfile], [docs/freepaneld], 
+    [docs/web.Doxyfile], [docs/web])
 
 AC_ARG_WITH([apache-dir], AS_HELP_STRING([--with-apache-dir], [Set the path where apache was installed]), 
     AC_CHECK_FILE([$with_php_dir/bin/php], 

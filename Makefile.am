@@ -1,5 +1,8 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -Im4
-EXTRA_DIST = $(top_srcdir)/thirdparty docs/freepaneld.Doxyfile
+EXTRA_DIST = $(top_srcdir)/thirdparty \
+	docs/freepaneld.Doxyfile web.Doxyfile \
+	freepaneld_fpdrp.md
+
 SUBDIRS = . src tests
 dist_sysconf_DATA = etc/freepaneld.cfg etc/freepaneld-log.properties
 

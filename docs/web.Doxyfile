@@ -1,7 +1,7 @@
 # Doxyfile 1.8.8
 
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = $(PROJECT)
+PROJECT_NAME           = $(PROJECT)-Web
 PROJECT_NUMBER         = $(VERSION)
 PROJECT_BRIEF          = Free and Open-Source Hosting Control Panel
 PROJECT_LOGO           = 
@@ -25,7 +25,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = src/
+STRIP_FROM_PATH        = web/
 STRIP_FROM_INC_PATH    = 
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = YES
@@ -36,7 +36,7 @@ SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 4
 ALIASES                = 
 TCL_SUBST              = 
-OPTIMIZE_OUTPUT_FOR_C  = NO
+OPTIMIZE_OUTPUT_FOR_C  = YES
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
 OPTIMIZE_OUTPUT_VHDL   = NO
@@ -66,7 +66,7 @@ HIDE_FRIEND_COMPOUNDS  = NO
 HIDE_IN_BODY_DOCS      = NO
 INTERNAL_DOCS          = YES
 CASE_SENSE_NAMES       = NO
-HIDE_SCOPE_NAMES       = NO
+HIDE_SCOPE_NAMES       = YES
 SHOW_INCLUDE_FILES     = YES
 SHOW_GROUPED_MEMB_INC  = NO
 FORCE_LOCAL_INCLUDES   = NO
@@ -96,9 +96,8 @@ WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO
 WARN_FORMAT            = "$file:$line: $text"
 WARN_LOGFILE           = 
-INPUT                  = src \
-                         README.md \
-                         docs/freepaneld_fpdrp.md
+INPUT                  = web \
+                         README.md
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
@@ -143,7 +142,9 @@ FILE_PATTERNS          = *.c \
                          *.as \
                          *.js
 RECURSIVE              = YES
-EXCLUDE                = 
+EXCLUDE                = web/static \
+                         web/template \
+                         web/core/library
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXCLUDE_SYMBOLS        = 
@@ -272,8 +273,8 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = 
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
-TAGFILES               = 
-GENERATE_TAGFILE       = docs/freepaneld.tag
+TAGFILES               = docs/freepaneld.tag=../../freepaneld/html
+GENERATE_TAGFILE       = 
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 EXTERNAL_PAGES         = YES
