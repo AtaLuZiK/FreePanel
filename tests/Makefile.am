@@ -1,5 +1,5 @@
 TESTS = URLEncoderTest
-GTEST_DIR = ../thirdparty/googletest/googletest
+GTEST_DIR = $(top_srcdir)/thirdparty/googletest/googletest
 check_PROGRAMS = URLEncoderTest
 LDADD = ${PTHREAD_LIBS} libgtest.a
 AM_CXXFLAGS = ${PTHREAD_CFLAGS}
