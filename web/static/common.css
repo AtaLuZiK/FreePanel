@@ -13,6 +13,9 @@ html, body {
 }
 
 /******** hack purecss ********/
+.pure-g [class *="pure-u"] {
+    font-family: "Segoe UI",'Lucida Grande','Lucida Sans Unicode',Helvetica,Arial,Verdana,'Microsoft YaHei UI',sans-serif;
+}
 .pure-form input[type=text], .pure-form input[type=password], .pure-form input[type=email]
 , .pure-form input[type=url], .pure-form input[type=date], .pure-form input[type=month]
 , .pure-form input[type=time], .pure-form input[type=datetime], .pure-form input[type=datetime-local]
@@ -26,6 +29,23 @@ html, body {
 .pure-button
 {
     border-radius: 0;
+}
+
+.pure-button.success {
+    background: rgb(28, 184, 65);
+}
+
+.pure-button.error {
+    background: rgb(202, 60, 60);
+}
+
+.pure-button.warning {
+    background: #F37B1D;
+    border-color: #F37B1D;
+}
+
+.pure-button.secondary {
+    background: rgb(66, 184, 221); /* this is a light blue */
 }
 
 .pure-button:hover, .pure-button:focus {

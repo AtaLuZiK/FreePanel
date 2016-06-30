@@ -7,4 +7,15 @@ class PhpController extends AuthorizedController
     {
         $this->display('php/info');
     }
+    
+    public function settings()
+    {
+        $this->display('php/settings');
+    }
+    
+    
+    public function edit()
+    {
+        
+    }
 }
