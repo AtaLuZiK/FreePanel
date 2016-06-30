@@ -7,7 +7,7 @@ typedef unsigned char byte;
 #define STREAM_PTR(x) ((std::string *)x)
 
 /**
- * a generally FreePanelPack likely following:
+ * a generally FreePanelPacket likely following:
  *
  * segment | note
  * --------|--------------
@@ -46,6 +46,9 @@ public:
     } Footer;
 #pragma pack(pop)
 
+    /**
+     * For more info see page @ref fpdrp
+     */
     enum class Command
     {
         NONE,       //!< Unset command, generally sent response by server.
@@ -53,6 +56,12 @@ public:
                     //!< directly without response
         TEST,       //!< If set this command, need not content, and server response
                     //!< a FPPacket and content is "success".
+        VHOST,      //!< Create/Update/Delete a virtual host, accept a json content
+                    //!< The first byte in content specified the action as following:
+                    //!< 0: Create
+                    //!< 1: Update
+                    //!< 2: Delete
+                    //!< 3: Query
     };
 
     static const uint16_t SIGN;
@@ -106,6 +115,5 @@ public:
     void *m_Data;
 
 };
-
 
 #endif /* FPPACKET_H_ */

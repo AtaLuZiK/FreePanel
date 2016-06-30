@@ -92,7 +92,7 @@ Create/Update/Delete a virtual host, accept a json content.
     <td>Result</td>
     <td>*</td>
     <td>
-      If the operation succeeds, the response value is "success". <br>
+      If the operation succeeds, the response value is "success". For operation code 3, returns a JSON-array contains virtual host configures<br>
       If the operation fails, the return value is the reasons for the failure. <br>
     </td>
   </tr>
