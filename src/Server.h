@@ -34,18 +34,9 @@ protected:
 
     void DispatchRequest(int clientSocket, const char *method, const char *url, const char *queryString);
 
-    /**
-     *
-     * @param clientSocket
-     * @return returns non-zero to disconnect
-     */
-    int DispatchPacket(int clientSocket);
-
-    int HandleTestCommand(int clientSocket, FPPacket *pPacket);
-    int HandleDisconnectCommand(int clientSocket, FPPacket *pPacket);
-
 private:
     static void *StartHandleConnection(void *socket);
+    void SendResponse(int clientSocket, uint8_t order, const char *entity, int length = -1);
     HandlerFactory m_HandlerFactory;
     
 };

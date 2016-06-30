@@ -2,19 +2,21 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include <string>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <map>
 #include "freepaneld.h"
+#include "AppConfig.h"
 #include "Server.h"
 #include "common.h"
 #include "Handler.h"
 #include "HttpPacket.h"
 #include "util/URLEncoder.h"
 #include "FPPacket.h"
+#include "IOSession.h"
+#include "IOHandler.h"
+#include "FPProtocolHandler.h"
 
 DECLARE_FP_LOGGER()
 
@@ -284,6 +286,16 @@ int get_line(int sock, char *buf, int size)
     return(i);
 }
 
+int empty_recv_buffer(int socket)
+{
+    const int BUFFER_SIZE = 2048;
+    char buffer[BUFFER_SIZE];
+    while (recv(socket, buffer, 1, MSG_PEEK | MSG_DONTWAIT)) {
+        recv(socket, buffer, BUFFER_SIZE, MSG_DONTWAIT);
+    }
+    return 0;
+}
+
 Server::Server()
 {
 }
@@ -338,9 +350,86 @@ void *Server::HandleConnection(int client)
     char *queryString = NULL;
 
     // preview if FPPacket
-    if (recv(client, buffer, 2, MSG_PEEK) == 2 && memcmp(buffer, &FPPacket::SIGN, 2) == 0) {
-        while (DispatchPacket(client) == 0);    // exit if DispatchPacket returns non-zero
+    if ((length = recv(client, buffer, 2, MSG_PEEK)) == 2 && memcmp(buffer, &FPPacket::SIGN, 2) == 0) {
+        IOSession session;
+        session.Attach(client);
+
+        FPProtocolHandler handler;
+        handler.OnSessionCreated(session);
+
+        while (session.IsConnected()) {
+            //FPLOG_DEBUG("Is connected");
+            const int HEADER_SIZE = sizeof(FPPacket::Header);
+            const int FOOTER_SIZE = sizeof(FPPacket::Footer);
+            byte pPacketBuffer[HEADER_SIZE + FOOTER_SIZE];
+            FPPacket::Header *pHeader = (FPPacket::Header *)pPacketBuffer;
+            FPPacket::Footer *pFooter = ((FPPacket::Footer *)pPacketBuffer + HEADER_SIZE);
+            byte *entity = nullptr;
+            FPPacket *pPacket = nullptr;
+            int read = 0;
+            if ((read = recv(client, pHeader, HEADER_SIZE, MSG_WAITALL)) != HEADER_SIZE) {
+                if (read == -1) {
+                    if (errno == EINTR) {
+                        FPLOG_WARN("Interrupted by signal, try again");
+                        continue;
+                    } else {
+                        FPLOG_FATAL(strerror(errno) << errno);
+                        return nullptr; // need not close socket manual, session do it.
+                    }
+                } else if (read == 0) {
+                    FPLOG_INFO("May be remote shutdown, disconnect it.");
+                    return nullptr;
+                } else {
+                    char *dumpView = dump_memory(pHeader, read);
+                    FPLOG_INFO("disconnect a peer which sent a incomplete header: " << dumpView);
+                    free(dumpView);
+                    empty_recv_buffer(client);
+                    continue;
+                }
+            }
+            if (!FPPacket::CheckHeader(pHeader)) {
+                char *dumpView = dump_memory(pHeader, sizeof(FPPacket::Header));
+                FPLOG_INFO("disconnect a peer which send a invalid header: " << dumpView);
+                free(dumpView);
+                empty_recv_buffer(client);
+                continue;
+            }
+            if (pHeader->entitySize) {
+                entity = (byte *)malloc(pHeader->entitySize);
+                if ((read = recv(client, entity, pHeader->entitySize, MSG_WAITALL)) != pHeader->entitySize) {
+                    FPLOG_INFO("disconnect a peer which declared " << pHeader->entitySize << " bytes content, but " << read << " sent.");
+                    empty_recv_buffer(client);
+                    continue;
+                }
+            }
+            if ((read = recv(client, pFooter, FOOTER_SIZE, MSG_WAITALL)) != FOOTER_SIZE) {
+                FPLOG_INFO("disconnect a peer which send a incomplete footer");
+                empty_recv_buffer(client);
+                continue;
+            }
+            pPacket = new FPPacket(pHeader, pFooter, entity);
+            try {
+                handler.OnDataReceived(session, pPacket, sizeof(FPPacket));
+                std::string response;
+                session.GetWritten(response);
+                session.EmptyWritten();
+                SendResponse(client, pPacket->GetOrder(), response.data(), response.size());
+                handler.OnDataSent(session, nullptr, 0);    // TODO: here should be a pointer to the data was sent.
+            } catch (std::exception& e) {
+                handler.OnExceptionCaught(session, std::current_exception());
+            }
+            delete pPacket;
+            if (entity)
+                free(entity);
+        }
+
+        session.Detach();
+        handler.OnSessionClosed(session);
     } else {
+        if (length == -1) {
+            FPLOG_FATAL(strerror(errno) << " on HTTP Handler");
+            return nullptr;
+        }
         //length = get_line(client, &buffer[2], sizeof(buffer) - 2) + 2;
         length = get_line(client, buffer, sizeof(buffer));
         const char *pCur = buffer;
@@ -401,96 +490,15 @@ void *Server::HandleConnection(int client)
 }
 
 
-int Server::DispatchPacket(int clientSocket)
+void Server::SendResponse(int clientSocket, uint8_t order, const char *entity, int length)
 {
-    log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger(DAEMON_NAME);
-    int nRetCode = 0;
-    typedef unsigned char byte;
-    const int HEADER_SIZE = sizeof(FPPacket::Header);
-    const int FOOTER_SIZE = sizeof(FPPacket::Footer);
-    byte *pPacketBuffer = (byte *)malloc(HEADER_SIZE + FOOTER_SIZE);
-    FPPacket::Header *pHeader = (FPPacket::Header *)pPacketBuffer;
-    FPPacket::Footer *pFooter = ((FPPacket::Footer *)pPacketBuffer + HEADER_SIZE);
-    byte *entity = nullptr;
-    FPPacket *pPacket = nullptr;
-    // the packet sign read by HandleConnection
-    // reset sign and set buffer as pHeader + 2bytes
-    //memcpy(pHeader, &FPPacket::SIGN, 2);
-    int read = 0;
-    if ((read = recv(clientSocket, pHeader, HEADER_SIZE, 0)) != HEADER_SIZE) {
-        char *dumpView = dump_memory(pHeader, read);
-        FPLOG_INFO("disconnect a peer which sent a incomplete header: " << dumpView);
-        free(dumpView);
-        printf("\n");
-        nRetCode = EXIT_FAILURE;
-        goto DISPATCH_PACKET_EXIT;
-    }
-    if (!FPPacket::CheckHeader(pHeader)) {
-        char *dumpView = dump_memory(pHeader, sizeof(FPPacket::Header));
-        FPLOG_INFO("disconnect a peer which send a invalid header");
-        free(dumpView);
-        for (int i = 0; i < HEADER_SIZE; ++i) {
-            printf("%02X ", ((byte *)pHeader)[i]);
-        }
-        printf("\n");
-        nRetCode = EXIT_FAILURE;
-        goto DISPATCH_PACKET_EXIT;
-    }
-    if (pHeader->entitySize) {
-        entity = (byte *)malloc(pHeader->entitySize);
-        if ((read = recv(clientSocket, entity, pHeader->entitySize, 0)) != pHeader->entitySize) {
-            FPLOG_INFO("disconnect a peer which declared " << pHeader->entitySize << " bytes content, but " << read << " sent.");
-            nRetCode = EXIT_FAILURE;
-            goto DISPATCH_PACKET_EXIT;
-        }
-    }
-    if ((read = recv(clientSocket, pFooter, FOOTER_SIZE, 0)) != FOOTER_SIZE) {
-        FPLOG_INFO("disconnect a peer which send a incomplete footer");
-        nRetCode = EXIT_FAILURE;
-        goto DISPATCH_PACKET_EXIT;
-    }
-    pPacket = new FPPacket(pHeader, pFooter, entity);
-    switch ((FPPacket::Command)pHeader->command) {
-    case FPPacket::Command::TEST:
-        nRetCode = HandleTestCommand(clientSocket, pPacket);
-        break;
-    case FPPacket::Command::DISCONNECT:
-        nRetCode = HandleDisconnectCommand(clientSocket, pPacket);
-        break;
-    case FPPacket::Command::NONE:
-    default:
-        FPLOG_INFO("Recviced a invlaid command: " << pHeader->command << " and discard it.");
-    }
-
-    DISPATCH_PACKET_EXIT:
-    if (entity)
-        free(entity);
-    if (pPacket)
-        delete pPacket;
-    free(pPacketBuffer);
-    return nRetCode;
-}
-
-
-int Server::HandleTestCommand(int clientSocket, FPPacket *pPacket)
-{
-    log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger(DAEMON_NAME);
-    LOG4CXX_INFO(logger, "Recviced a TEST command");
     FPPacket response;
-    response.SetOrder(pPacket->GetOrder());
-    response.Append("success");
+    response.SetOrder(order);
+    if (entity && length > 0)
+        response.Append(entity, length);
     const byte *buffer = response.Generate();
     unsigned int bufferSize = response.GetSize();
     send(clientSocket, buffer, bufferSize, 0);
-    return 0;
-}
-
-
-int Server::HandleDisconnectCommand(int clientSocket, FPPacket *pPacket)
-{
-    log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger(DAEMON_NAME);
-    LOG4CXX_INFO(logger, "Recviced a DISCONNECT command");
-    return 1;   // close socket
 }
 
 
