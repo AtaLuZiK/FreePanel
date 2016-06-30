@@ -1,9 +1,13 @@
 bin_PROGRAMS = freepaneld
 freepaneld_LDADD = ${PTHREAD_LIBS} ${LIBCONFIGXX_LIBS} ${LIBLOG4CXX_LIBS}
-freepaneld_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\"
+freepaneld_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -DLOCALSTATEDIR=\"${localstatedir}\"
 freepaneld_CXXFLAGS = \
     -I$(top_srcdir)/thirdparty/rapidjson/include \
-    ${PTHREAD_CFLAGS} ${LIBCONFIGXX_CFLAGS}
+    ${PTHREAD_CFLAGS} ${LIBCONFIGXX_CFLAGS} \
+    -include exception \
+    -include string \
+    -include stddef.h \
+    -include unistd.h
 freepaneld_util_SOURCES = \
     util/Singleton.h \
     util/URLEncoder.h util/URLEncoder.cxx
@@ -21,5 +25,9 @@ freepaneld_SOURCES = \
     Handler.h \
     HttpPacket.h \
     FPPacket.h FPPacket.cxx \
+    VirtualHostConfig.h VirtualHostConfig.cxx \
+    IOSession.h IOSession.cxx \
+    IOHandler.h IOHandler.cxx \
+    FPProtocolHandler.h FPProtocolHandler.cxx \
     ${freepaneld_util_SOURCES} ${freepaneld_handler_SOURCES}
 
