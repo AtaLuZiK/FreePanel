@@ -582,5 +582,5 @@ AM_SUBST_NOTMAKE([DX_RULES])
 #echo DX_FLAG_xml=$DX_FLAG_xml
 #echo DX_FLAG_pdf=$DX_FLAG_pdf
 #echo DX_FLAG_ps=$DX_FLAG_ps
-echo DX_ENV=$DX_ENV
+#echo DX_ENV=$DX_ENV
 ])
