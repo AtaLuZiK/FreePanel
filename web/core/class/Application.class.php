@@ -278,6 +278,11 @@ class Application
     
     public function handleError($errno, $errmsg, $errfile, $errline)
     {
+        if ($errno === E_WARNING) {
+            // ignore warning always
+            // TODO: save warning in stack, and use float layer show it if possible
+            return;
+        }
         if (!(error_reporting() & $errno))  // This error code is not included in error_reporting
             return;
         $message = "$errmsg ($errfile, Line: $errline)";
