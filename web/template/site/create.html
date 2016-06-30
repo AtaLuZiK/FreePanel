@@ -1,0 +1,179 @@
+<@layout name="layout" />
+
+{% block tag_head_end %}
+<style>
+.red {
+    color: red;
+}
+
+.pure-form {
+    padding: 0;
+}
+
+.pure-form input {
+    width: 100%;
+}
+
+.pure-form>.form-group {
+    border: 1px solid #d1d5d8;
+    border-bottom: 0;
+    border-top: 0;
+}
+
+.pure-form>.form-group:first-of-type {
+    border-top: 1px solid #d1d5d8;
+}
+
+.pure-form>div:nth-last-of-type(3) {
+    border-bottom: 1px solid #d1d5d8;
+}
+
+.pure-form>.form-group>.header {
+    float: left;
+    background: #e9edf0;
+    border-top: 1px solid #d1d5d8;
+    border-bottom: 1px solid #d1d5d8;
+    padding: 8px 0 8px 8px;
+    font-weight: 700;
+    width: 100%;
+}
+
+.pure-form>.form-group:first-child>.header {
+    border-top: 0;
+}
+
+.pure-form>.form-group>.header>label {
+    display: inline-block;
+    margin: 0;
+}
+
+.pure-form>.form-group>[class *="pure-u"] {
+    border-bottom: 1px solid #f1f2f3;
+}
+
+label.pure-checkbox>input {
+    width: auto;
+}
+
+label+small {
+    display: block;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+    <header class="pure-u-1">
+        <h2>Add Virtual Host</h2>
+    </header>
+    <div class="pure-u-md-1">
+        <form class="pure-form" method="post" action="<?=make_url('edit')?>">
+            <div class="pure-g form-group">
+                <div class="header">Domain settings</div>
+                <!-- domain -->
+                <div class="pure-u-md-1-2">
+                    <label for="domain">Domain<span class="red">*</span>:</label>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="domain" name="domain" type="text" pattern="^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$" required>
+                </div>
+                <!-- alias -->
+                <div class="pure-u-md-1-2">
+                    <label for="alias">Alias for domain:</label>
+                    <small>Multiple alias are separated by blank space</small>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="alias" name="alias" type="text" >
+                </div>
+            </div>
+            
+            <div class="pure-g form-group">
+                <div class="header">Webserver settings</div>
+                <!-- DocumentRoot -->
+                <div class="pure-u-md-1-2">
+                    <label for="document-root">DocumentRoot:</label>
+                    <small>empty for defaults under <span class="red">/var/www</span></small>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="document-root" name="documentRoot" type="text">
+                </div>
+            </div>
+            
+            <div class="pure-g form-group">
+                <div class="header"><label class="pure-checkbox"><input name="createFTP" type="checkbox"> Create FTP account</label></div>
+                <!-- DocumentRoot -->
+                <div class="pure-u-md-1-2">
+                    <label for="ftp-username">Login name:</label>
+                    <small>empty for defaults is domain</small>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="ftp-username" name="ftpUsername" type="text">
+                </div>
+                <!-- alias -->
+                <div class="pure-u-md-1-2">
+                    <label for="ftp-password">Password:</label>
+                    <small>empty for generate random password</small>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="ftp-password" name="ftpPassword" type="password">
+                </div>
+            </div>
+            
+            <div class="pure-g form-group">
+                <div class="header"><label class="pure-checkbox"><input name="createMysql" type="checkbox"> Create MySQL account</label></div>
+                <!-- DocumentRoot -->
+                <div class="pure-u-md-1-2">
+                    <label for="mysql-username">Username:</label>
+                    <small>empty for defaults is domain</small>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="mysql-username" name="mysqlUsername" type="text">
+                </div>
+                <!-- alias -->
+                <div class="pure-u-md-1-2">
+                    <label for="mysql-password">Password:</label>
+                    <small>empty for generate random password</small>
+                </div>
+                <div class="pure-u-md-1-2">
+                    <input id="mysql-password" name="mysqlPassword" type="password">
+                </div>
+            </div>
+            <div class="pure-u-1">
+                <div id="message" class="alert danger" style="display: none;"></div>
+            </div>
+            <div class="pure-u-1">
+                <div style="float: left;">
+                    <span class="red">*</span>: This value is mandatory
+                </div>
+                <div style="float: right;">
+                    <button class="pure-button pure-button-primary" type="submit">Save</button>
+                    <button class="pure-button warning" type="reset">Reset</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block tag_body_end %}
+<script type="text/javascript">
+$(function() {
+    $("form").submit(function(event) {
+        event.preventDefault();
+        $.post({
+            url: $(this).attr("action"),
+            data: $(this).serialize(),
+            method: $(this).attr('method'),
+        }).done(function(data) {
+            if (data.success) {
+                window.location = "<?=make_url('list')?>";
+            } else {
+            	$('#message').show();
+                $('#message').text(data.message);
+            };
+        });
+    });
+});
+</script>
+{% endblock %}
+

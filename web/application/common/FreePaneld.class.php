@@ -1,11 +1,17 @@
 <?php
 defined('BASE_PATH') || exit('No direct script access allowed');
 
+/**
+ * 
+ * @author arthas
+ * @see @ref fpdrp
+ */
 class FPPacket
 {
     const COMMAND_NONE = 0;
     const COMMAND_DISCONNECT = 1;
     const COMMAND_TEST = 2;
+    const COMMON_EDIT_VHOST = 3;
 
     private $command;
     private $entity;
@@ -141,6 +147,65 @@ class FreePaneld
         return $response;
     }
     
+    
+    /**
+     * 
+     * @param string $domain
+     * @param array $configs
+     * DOCUMENT_ROOT
+     * ALIAS
+     */
+    public function createHost($domain, $configs)
+    {
+        return $this->editHost(0, $domain, $configs);
+    }
+    
+    
+    public function updateHost($domain, $configs)
+    {
+        return $this->editHost(1, $domain, $configs);
+    }
+    
+    
+    public function deleteHost($domain, $configs)
+    {
+        return $this->editHost(2, $domain, $configs);
+    }
+    
+    
+    public function getHost($domain)
+    {
+        $configs = [];
+        if (!empty($domain)) {
+            $configs['DOMAIN'] = $domain;
+        }
+        $entity = pack('C', 3) . json_encode($configs, JSON_FORCE_OBJECT);
+        $packet = new FPPacket($this->packetOrder++, FPPacket::COMMON_EDIT_VHOST, $entity);
+        $response = $this->sendPacket($packet);
+        return $response;
+    }
+    
+    
+    private function editHost($action, $domain, $configs)
+    {
+        if (empty($domain))
+            return false;
+        $configs['DOMAIN'] = $domain;
+        $entity = pack('C', $action) . json_encode($configs, JSON_FORCE_OBJECT);
+        $packet = new FPPacket($this->packetOrder++, FPPacket::COMMON_EDIT_VHOST, $entity);
+        try {
+            $response = $this->sendPacket($packet);
+        } catch (Exception $e) {
+            if ($e->getCode() == 4) {
+                return true;
+            } else {
+                throw $e;
+            }
+        }
+        return $response == 'success' ? true : $response;
+    }
+    
+    
     private function sendPacket($packet)
     {
         if (!$this->connected)
@@ -153,11 +218,16 @@ class FreePaneld
         }
         $dataSize = socket_recv($this->socket, $buffer, self::HEADER_SIZE, 0);
         if ($dataSize != self::HEADER_SIZE) {
-            throw Exception('recviced a invalid Packet');
+            if ($dataSize == 0) {
+                // close by remote peer
+                throw new Exception(socket_strerror(), socket_last_error());
+            } else {
+                throw new Exception('recviced a invalid Packet');
+            }
         }
         $header = FPPacket::unpackHeader($buffer);
         if ($packet->getOrder() != $header['order']) {
-            throw Exception('packet order incorrect');
+            throw new Exception('packet order incorrect');
         }
         $contentSize = $header['contentSize'];
         $content = null;
@@ -167,7 +237,7 @@ class FreePaneld
         // footer
         $buffer = socket_read($this->socket, self::FOOTER_SIZE);
         if (strlen($buffer) != self::FOOTER_SIZE) {
-            throw Exception('recviced a invalid packet');
+            throw new Exception('recviced a invalid packet');
         }
         return $content;
     }
